@@ -6,12 +6,13 @@ import {
   ConnectButton,
   lightTheme,
 } from '@rainbow-me/rainbowkit';
-import { WagmiProvider, useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { WagmiProvider, useAccount, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import TicTacToe from './components/TicTacToe';
 import { motion } from 'motion/react';
 import { Sparkles, CalendarCheck2, ExternalLink } from 'lucide-react';
+import { encodeFunctionData, concat } from 'viem';
 
 const config = getDefaultConfig({
   appName: 'Base Spring Tic-Tac-Toe',
@@ -38,20 +39,24 @@ const CHECK_IN_ABI = [
 
 const CheckInUI = () => {
     const { isConnected, address } = useAccount();
-    const { data: hash, writeContract, isPending, error } = useWriteContract();
+    const { data: hash, sendTransaction, isPending, error } = useSendTransaction();
 
     const { isLoading: isConfirming, isSuccess: isConfirmed } = 
         useWaitForTransactionReceipt({ hash });
 
     const handleCheckIn = () => {
-        writeContract({
-            address: CHECK_IN_CONTRACT_ADDRESS,
+        // Encode the function call to 'checkIn'
+        const funcData = encodeFunctionData({
             abi: CHECK_IN_ABI,
             functionName: 'checkIn',
-            // @ts-ignore - Adding builder code to transaction calldata (Builder Codes standard)
-            data: BUILDER_CODE_HEX,
-            chain: base,
-            account: address,
+        });
+        
+        // Append the builder code to the calldata (Base Builder Code standard)
+        const finalData = concat([funcData, BUILDER_CODE_HEX]);
+
+        sendTransaction({
+            to: CHECK_IN_CONTRACT_ADDRESS,
+            data: finalData,
         });
     };
 
@@ -59,7 +64,7 @@ const CheckInUI = () => {
         <div className="flex flex-col items-center gap-4 w-full">
             {!isConnected ? (
                 <div className="flex flex-col items-center gap-3">
-                    <p className="text-sm text-gray-500 font-medium text-center">Подключите кошелек, чтобы сделать чек-ин на Base</p>
+                    <p className="text-sm text-gray-500 font-medium text-center">Connect your wallet to check in on Base</p>
                     <ConnectButton />
                 </div>
             ) : (
@@ -70,8 +75,8 @@ const CheckInUI = () => {
                                 <CalendarCheck2 size={24} />
                             </div>
                             <div>
-                                <h3 className="font-playful font-bold text-gray-800">Ежедневный Чек-ин</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Сеть Base • Только газ</p>
+                                <h3 className="font-playful font-bold text-gray-800">Daily Check-in</h3>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Base Network • Gas Only</p>
                             </div>
                         </div>
                         <motion.button
@@ -85,7 +90,7 @@ const CheckInUI = () => {
                                 : 'bg-pink-500 text-white hover:bg-pink-600 active:bg-pink-700'
                             }`}
                         >
-                            {isPending || isConfirming ? 'Отправка...' : isConfirmed ? 'Готово!' : 'Отметиться'}
+                            {isPending || isConfirming ? 'Sending...' : isConfirmed ? 'Success!' : 'Check In'}
                         </motion.button>
                     </div>
                     {isConfirmed && (
@@ -94,12 +99,12 @@ const CheckInUI = () => {
                             animate={{ opacity: 1, y: 0 }}
                             className="text-xs text-green-600 font-bold flex items-center gap-1"
                         >
-                            Чек-ин успешно выполнен! <a href={`https://basescan.org/tx/${hash}`} target="_blank" rel="noopener noreferrer" className="underline flex items-center gap-0.5">BaseScan <ExternalLink size={10}/></a>
+                            Check-in successful! <a href={`https://basescan.org/tx/${hash}`} target="_blank" rel="noopener noreferrer" className="underline flex items-center gap-0.5">BaseScan <ExternalLink size={10}/></a>
                         </motion.div>
                     )}
                     {error && (
                         <p className="text-[10px] text-red-500 max-w-[200px] text-center">
-                            Оплата газа не прошла (Вероятно, недостаточно средств или контракт-заглушка)
+                            Transaction failed. Make sure you have enough ETH for gas and are on the Base network.
                         </p>
                     )}
                 </div>
