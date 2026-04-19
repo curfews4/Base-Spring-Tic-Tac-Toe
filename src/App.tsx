@@ -187,10 +187,10 @@ export default function App() {
                         <div className="mt-auto pt-6">
                             <div className="p-4 rounded-2xl bg-white/5 border border-dashed border-white/20">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-[10px] text-white/50 uppercase font-bold">Builder Code</span>
-                                    <span className="text-[10px] font-mono bg-green-500/20 px-2 py-0.5 rounded text-green-300 uppercase">bc_0c54k1me</span>
+                                    <span className="text-[10px] text-white/50 uppercase font-bold">Network Status</span>
+                                    <span className="text-[10px] font-mono bg-green-500/20 px-2 py-0.5 rounded text-green-300 uppercase">Live</span>
                                 </div>
-                                <p className="mt-1 text-[10px] font-mono opacity-60 truncate">0x23068D4e68ff8D257A3c0C613Db1223Cd08F48fC</p>
+                                <p className="mt-1 text-[10px] font-mono opacity-60 truncate">Base Mainnet Protocol</p>
                             </div>
                         </div>
                     </div>
@@ -204,7 +204,7 @@ export default function App() {
                     <span className="hidden sm:inline">Smart Wallet Ready</span>
                     <span className="hidden sm:inline">Developer Resources</span>
                 </div>
-                <div>© 2024 BaseToe Protocol</div>
+                <div>© 2026 BaseToe Protocol</div>
             </footer>
           </div>
         </RainbowKitProvider>
