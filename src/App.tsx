@@ -23,7 +23,9 @@ const config = getDefaultConfig({
 const queryClient = new QueryClient();
 
 // Mock contract info - in a real app these would be real addresses
-const CHECK_IN_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000' as `0x${string}`; 
+const CHECK_IN_CONTRACT_ADDRESS = '0x23068D4e68ff8D257A3c0C613Db1223Cd08F48fC' as `0x${string}`; 
+const BUILDER_CODE_HEX = '0x62635f306335346b316d65' as `0x${string}`; // Hex for "bc_0c54k1me"
+
 const CHECK_IN_ABI = [
   {
     "inputs": [],
@@ -42,13 +44,12 @@ const CheckInUI = () => {
         useWaitForTransactionReceipt({ hash });
 
     const handleCheckIn = () => {
-        // This is a placeholder call. Real contract on Base is needed.
-        // We simulate the interaction.
         writeContract({
             address: CHECK_IN_CONTRACT_ADDRESS,
             abi: CHECK_IN_ABI,
             functionName: 'checkIn',
-            // @ts-ignore - Some wagmi versions require explicit chain/account even if connected
+            // @ts-ignore - Adding builder code to transaction calldata (Builder Codes standard)
+            data: BUILDER_CODE_HEX,
             chain: base,
             account: address,
         });
@@ -182,9 +183,9 @@ export default function App() {
                             <div className="p-4 rounded-2xl bg-white/5 border border-dashed border-white/20">
                                 <div className="flex justify-between items-center">
                                     <span className="text-[10px] text-white/50 uppercase font-bold">Builder Code</span>
-                                    <span className="text-[10px] font-mono bg-blue-500/20 px-2 py-0.5 rounded text-blue-300 uppercase">Verified</span>
+                                    <span className="text-[10px] font-mono bg-green-500/20 px-2 py-0.5 rounded text-green-300 uppercase">bc_0c54k1me</span>
                                 </div>
-                                <p className="mt-1 text-[10px] font-mono opacity-60 truncate">0xBASE_Tic_Toe_Contract_V1</p>
+                                <p className="mt-1 text-[10px] font-mono opacity-60 truncate">0x23068D4e68ff8D257A3c0C613Db1223Cd08F48fC</p>
                             </div>
                         </div>
                     </div>
